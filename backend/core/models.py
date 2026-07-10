@@ -57,6 +57,10 @@ class Attendance(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
     date = models.DateField()
     check_in_time = models.TimeField(auto_now_add=True)
+    check_out_time = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("gym", "member", "date")
 
     def __str__(self):
         return f"{self.member.name} - {self.date}"
