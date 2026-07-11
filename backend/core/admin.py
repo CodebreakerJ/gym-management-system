@@ -3,7 +3,9 @@ from django.contrib import admin
 from .models import (
     Attendance,
     Gym,
+    GymSettings,
     Member,
+    MembershipHistory,
     MembershipPlan,
     StaffProfile,
 )
@@ -77,3 +79,54 @@ class AttendanceAdmin(admin.ModelAdmin):
     )
     list_filter = ("gym", "date")
     search_fields = ("member__name", "member__phone")
+
+@admin.register(MembershipHistory)
+class MembershipHistoryAdmin(admin.ModelAdmin):
+    list_display = (
+        "member",
+        "gym",
+        "plan",
+        "start_date",
+        "end_date",
+        "plan_price",
+        "created_by",
+        "created_at",
+    )
+
+    list_filter = (
+        "gym",
+        "plan",
+        "start_date",
+        "end_date",
+    )
+
+    search_fields = (
+        "member__name",
+        "member__phone",
+        "plan__plan_name",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
+
+@admin.register(GymSettings)
+class GymSettingsAdmin(admin.ModelAdmin):
+    list_display = (
+        "gym",
+        "opening_time",
+        "closing_time",
+        "currency",
+        "timezone",
+        "updated_at",
+    )
+
+    search_fields = (
+        "gym__gym_name",
+        "gst_number",
+    )
+
+    list_filter = (
+        "currency",
+        "timezone",
+    )    

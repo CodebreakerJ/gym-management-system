@@ -7,11 +7,12 @@ from core.models import Member
 from core.serializers import MemberSerializer
 from core.pagination import StandardResultsSetPagination
 from core.utils.helpers import get_user_gym
+from core.permissions import IsOwnerOrReceptionist
 
 
 class MemberViewSet(viewsets.ModelViewSet):
     serializer_class = MemberSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReceptionist]
     pagination_class = StandardResultsSetPagination
 
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]

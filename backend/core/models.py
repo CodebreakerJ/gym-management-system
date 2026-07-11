@@ -21,6 +21,60 @@ class Gym(models.Model):
     def __str__(self):
         return self.gym_name
 
+class GymSettings(models.Model):
+    CURRENCY_CHOICES = (
+        ("INR", "Indian Rupee"),
+        ("USD", "US Dollar"),
+    )
+
+    gym = models.OneToOneField(
+        Gym,
+        on_delete=models.CASCADE,
+        related_name="settings",
+    )
+
+    opening_time = models.TimeField(
+        null=True,
+        blank=True,
+    )
+
+    closing_time = models.TimeField(
+        null=True,
+        blank=True,
+    )
+
+    currency = models.CharField(
+        max_length=10,
+        choices=CURRENCY_CHOICES,
+        default="INR",
+    )
+
+    timezone = models.CharField(
+        max_length=50,
+        default="Asia/Kolkata",
+    )
+
+    gst_number = models.CharField(
+        max_length=30,
+        blank=True,
+    )
+
+    website = models.URLField(
+        blank=True,
+    )
+
+    description = models.TextField(
+        blank=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    def __str__(self):
+        return f"{self.gym.gym_name} settings"
+
+
 class StaffProfile(models.Model):
     ROLE_CHOICES = (
         ("owner", "Owner"),
@@ -93,6 +147,59 @@ class MembershipPlan(models.Model):
     def __str__(self):
         return self.plan_name
 
+class MembershipHistory(models.Model):
+    gym = models.ForeignKey(
+        Gym,
+        on_delete=models.CASCADE,
+        related_name="membership_history",
+    )
+
+    member = models.ForeignKey(
+        "Member",
+        on_delete=models.CASCADE,
+        related_name="membership_history",
+    )
+
+    plan = models.ForeignKey(
+        MembershipPlan,
+        on_delete=models.PROTECT,
+        related_name="membership_history",
+    )
+
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    plan_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+
+    notes = models.TextField(blank=True)
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_membership_history",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+        indexes = [
+            models.Index(fields=["gym", "member"]),
+            models.Index(fields=["gym", "end_date"]),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.member.name} - "
+            f"{self.plan.plan_name} - "
+            f"{self.start_date} to {self.end_date}"
+        )
 
 class Member(models.Model):
     GENDER_CHOICES = (

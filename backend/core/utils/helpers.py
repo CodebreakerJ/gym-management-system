@@ -15,7 +15,11 @@ def get_user_gym(user):
     staff_profile = (
         StaffProfile.objects
         .select_related("gym")
-        .filter(user=user, is_active=True)
+        .filter(
+            user=user,
+            is_active=True,
+            user__is_active=True,
+        )
         .first()
     )
 
@@ -26,13 +30,21 @@ def get_user_gym(user):
 
 
 def get_user_role(user):
+    if not user or not user.is_authenticated:
+        return None
+
     if Gym.objects.filter(owner=user).exists():
         return "owner"
 
-    staff_profile = StaffProfile.objects.filter(
-        user=user,
-        is_active=True,
-    ).first()
+    staff_profile = (
+        StaffProfile.objects
+        .filter(
+            user=user,
+            is_active=True,
+            user__is_active=True,
+        )
+        .first()
+    )
 
     if staff_profile:
         return staff_profile.role

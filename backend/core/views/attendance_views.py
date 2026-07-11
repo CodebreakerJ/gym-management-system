@@ -7,11 +7,11 @@ from rest_framework.exceptions import ValidationError
 from core.models import Attendance, Member
 from core.serializers import AttendanceSerializer
 from core.utils.helpers import get_user_gym
-
+from core.permissions import IsOwnerOrReceptionist
 
 class AttendanceViewSet(viewsets.ModelViewSet):
     serializer_class = AttendanceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReceptionist]
 
     def get_queryset(self):
         gym = get_user_gym(self.request.user)
