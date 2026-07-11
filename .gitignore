@@ -22,3 +22,12 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+.env
+*.env
+backend/.env
+backend/env/
+backend/db.sqlite3
+frontend/node_modules/
+__pycache__/
+*.pyc

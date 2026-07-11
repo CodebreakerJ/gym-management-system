@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.exceptions import ValidationError
 from core.models import Attendance, Member
 from core.serializers import AttendanceSerializer
 from core.utils.helpers import get_user_gym
@@ -19,6 +19,13 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         gym = get_user_gym(self.request.user)
+        member = serializer.validated_data["member"]
+
+        if member.gym_id != gym.id:
+            raise ValidationError(
+                {"member": "This member does not belong to your gym."}
+            )
+
         serializer.save(gym=gym)
 
 
