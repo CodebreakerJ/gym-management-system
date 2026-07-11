@@ -37,6 +37,12 @@ from core.views.renewal_views import (
     MemberMembershipHistoryView,
     RenewMembershipView,
 )
+from core.views.revenue_views import (
+    MonthlyRevenueChartView,
+    PlanWiseRevenueView,
+    RecentRenewalsView,
+    RevenueSummaryView,
+)
 
 router = DefaultRouter()
 router.register("members", MemberViewSet, basename="members")
@@ -88,5 +94,28 @@ path(
     "staff/<int:staff_id>/",
     StaffDetailView.as_view(),
     name="staff-detail",
+),
+path(
+    "dashboard/revenue-summary/",
+    RevenueSummaryView.as_view(),
+    name="revenue-summary",
+),
+
+path(
+    "dashboard/monthly-revenue/",
+    MonthlyRevenueChartView.as_view(),
+    name="monthly-revenue",
+),
+
+path(
+    "dashboard/plan-wise-revenue/",
+    PlanWiseRevenueView.as_view(),
+    name="plan-wise-revenue",
+),
+
+path(
+    "dashboard/recent-renewals/",
+    RecentRenewalsView.as_view(),
+    name="recent-renewals",
 ),
 ]
