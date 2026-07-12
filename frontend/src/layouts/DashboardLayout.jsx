@@ -1,22 +1,15 @@
-import {
-  useState,
-} from "react";
-
-import {
-  Outlet,
-} from "react-router-dom";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 
 function DashboardLayout() {
-  const [
-    isSidebarOpen,
-    setIsSidebarOpen,
-  ] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] =
+    useState(false);
 
   return (
-    <div className="min-h-screen text-zinc-100">
+    <div className="min-h-screen text-slate-900">
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() =>

@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 
-function ReportsPage() {
+function NotificationsPage() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -11,14 +11,14 @@ function ReportsPage() {
       </p>
 
       <h1 className="mt-2 text-3xl font-semibold text-white">
-        Reports
+        Notifications
       </h1>
 
       <p className="mt-2 text-zinc-500">
-        Review active, expired and renewal reports.
+        Track expiring, expired and absent members.
       </p>
     </motion.div>
   );
 }
 
-export default ReportsPage;
+export default NotificationsPage;

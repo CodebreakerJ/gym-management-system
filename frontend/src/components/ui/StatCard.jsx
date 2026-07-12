@@ -1,21 +1,36 @@
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+
 import { motion } from "motion/react";
 
 const accentStyles = {
-  violet:
-    "from-violet-500/25 to-fuchsia-500/5 text-violet-300 ring-violet-400/20",
+  indigo: {
+    icon: "bg-indigo-50 text-[#4F46E5] border-indigo-100",
+    glow: "from-indigo-500/10 to-transparent",
+  },
 
-  cyan:
-    "from-cyan-500/25 to-blue-500/5 text-cyan-300 ring-cyan-400/20",
+  cyan: {
+    icon: "bg-cyan-50 text-[#06B6D4] border-cyan-100",
+    glow: "from-cyan-500/10 to-transparent",
+  },
 
-  emerald:
-    "from-emerald-500/25 to-teal-500/5 text-emerald-300 ring-emerald-400/20",
+  green: {
+    icon: "bg-green-50 text-[#22C55E] border-green-100",
+    glow: "from-green-500/10 to-transparent",
+  },
 
-  amber:
-    "from-amber-500/25 to-orange-500/5 text-amber-300 ring-amber-400/20",
+  orange: {
+    icon: "bg-orange-50 text-[#F59E0B] border-orange-100",
+    glow: "from-orange-500/10 to-transparent",
+  },
 
-  rose:
-    "from-rose-500/25 to-red-500/5 text-rose-300 ring-rose-400/20",
+  red: {
+    icon: "bg-red-50 text-[#EF4444] border-red-100",
+    glow: "from-red-500/10 to-transparent",
+  },
 };
 
 function StatCard({
@@ -23,9 +38,20 @@ function StatCard({
   value,
   description,
   icon: Icon,
-  accent = "violet",
+  accent = "indigo",
   delay = 0,
+  growth,
+  trend = "up",
 }) {
+  const colors =
+    accentStyles[accent] ||
+    accentStyles.indigo;
+
+  const TrendIcon =
+    trend === "down"
+      ? TrendingDown
+      : TrendingUp;
+
   return (
     <motion.article
       initial={{
@@ -38,44 +64,70 @@ function StatCard({
       }}
       transition={{
         delay,
-        duration: 0.45,
+        duration: 0.4,
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover={{
-        y: -5,
-        scale: 1.012,
+        y: -4,
       }}
-      className="glass-panel relative overflow-hidden rounded-3xl p-5 shadow-2xl shadow-black/10"
+      className="group relative overflow-hidden rounded-[20px] border border-[#E5E7EB] bg-white p-6 shadow-[0_12px_35px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)]"
     >
-      <div className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-white/[0.025] blur-xl" />
+      <div
+        className={`pointer-events-none absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl ${colors.glow}`}
+      />
 
-      <div className="relative flex items-start justify-between">
+      <div className="relative flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-zinc-400">
+          <p className="text-sm font-medium text-[#64748B]">
             {title}
           </p>
 
-          <h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">
+          <h3 className="mt-3 font-['Manrope'] text-3xl font-bold tracking-tight text-[#111827]">
             {value}
           </h3>
 
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs leading-5 text-[#94A3B8]">
             {description}
           </p>
         </div>
 
-        <div
-          className={`rounded-2xl bg-gradient-to-br p-3 ring-1 ${
-            accentStyles[accent]
-          }`}
+        <motion.div
+          whileHover={{
+            rotate: 5,
+            scale: 1.04,
+          }}
+          className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${colors.icon}`}
         >
-          <Icon size={22} />
-        </div>
+          <Icon size={21} />
+        </motion.div>
       </div>
 
-      <div className="relative mt-5 flex items-center gap-1 text-xs text-zinc-500">
-        View details
-        <ArrowUpRight size={13} />
+      <div className="relative mt-6 flex items-center justify-between">
+        {growth !== undefined ? (
+          <div
+            className={`flex items-center gap-1.5 text-xs font-semibold ${
+              trend === "down"
+                ? "text-[#EF4444]"
+                : "text-[#22C55E]"
+            }`}
+          >
+            <TrendIcon size={14} />
+
+            {growth}%
+          </div>
+        ) : (
+          <span className="text-xs text-[#94A3B8]">
+            Updated today
+          </span>
+        )}
+
+        <button
+          type="button"
+          className="flex items-center gap-1 text-xs font-medium text-[#64748B] transition group-hover:text-[#4F46E5]"
+        >
+          View details
+          <ArrowUpRight size={13} />
+        </button>
       </div>
     </motion.article>
   );

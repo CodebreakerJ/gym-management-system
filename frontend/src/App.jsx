@@ -6,7 +6,6 @@ import {
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
-
 import LoginPage from "./pages/auth/LoginPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import MembersPage from "./pages/members/MembersPage";

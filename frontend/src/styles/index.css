@@ -10,14 +10,36 @@
     "Segoe UI",
     sans-serif;
 
-  color: #e4e4e7;
-  background: #09090b;
+  color: #111827;
+  background: #f8fafc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+
+  --background: #f8fafc;
+  --sidebar: #111827;
+  --card: #ffffff;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary: #06b6d4;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --heading: #111827;
+  --body: #64748b;
+  --border: #e5e7eb;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 html {
@@ -28,19 +50,21 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  color: var(--heading);
 
-  background:
-    radial-gradient(
-      circle at 10% 0%,
-      rgba(139, 92, 246, 0.17),
-      transparent 30%
+  background-color: var(--background);
+  background-image:
+    linear-gradient(
+      rgba(79, 70, 229, 0.035) 1px,
+      transparent 1px
     ),
-    radial-gradient(
-      circle at 100% 20%,
-      rgba(34, 211, 238, 0.11),
-      transparent 30%
-    ),
-    #09090b;
+    linear-gradient(
+      90deg,
+      rgba(79, 70, 229, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 42px 42px;
 }
 
 button,
@@ -55,11 +79,13 @@ button {
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.35);
+  color: #111827;
+  background: rgba(79, 70, 229, 0.16);
 }
 
 ::-webkit-scrollbar {
   width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
@@ -67,28 +93,63 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: #cbd5e1;
   border-radius: 999px;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .glass-panel {
-  background: rgba(24, 24, 27, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 18px 45px rgba(15, 23, 42, 0.05),
+    0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 .grid-pattern {
+  background-color: #f8fafc;
+
   background-image:
     linear-gradient(
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(79, 70, 229, 0.035) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.025) 1px,
+      rgba(79, 70, 229, 0.035) 1px,
       transparent 1px
     );
 
-  background-size: 28px 28px;
+  background-size: 42px 42px;
+}
+
+.premium-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.05),
+    0 2px 6px rgba(15, 23, 42, 0.03);
+
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-3px);
+  border-color: #dbeafe;
+
+  box-shadow:
+    0 20px 40px rgba(15, 23, 42, 0.08),
+    0 4px 10px rgba(79, 70, 229, 0.05);
 }

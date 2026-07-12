@@ -11,10 +11,7 @@ import {
 } from "lucide-react";
 
 import { motion } from "motion/react";
-
-import {
-  NavLink,
-} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import {
   getCurrentGym,
@@ -76,29 +73,24 @@ function Sidebar({
           type="button"
           aria-label="Close sidebar overlay"
           onClick={onClose}
-          className="fixed inset-0 z-30 bg-black/65 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-slate-950/35 backdrop-blur-sm lg:hidden"
         />
       )}
 
-      <motion.aside
-        initial={false}
-        animate={{
-          x: isOpen ? 0 : "-100%",
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 320,
-          damping: 34,
-        }}
-        className="glass-panel fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 lg:translate-x-0"
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/5 bg-[#111827] shadow-2xl shadow-slate-950/20 transition-transform duration-300 ease-out lg:translate-x-0 ${
+          isOpen
+            ? "translate-x-0"
+            : "-translate-x-full"
+        }`}
       >
-        <div className="flex h-20 items-center justify-between px-6">
+        <div className="flex h-20 items-center justify-between border-b border-white/5 px-6">
           <NavLink
             to="/dashboard"
             onClick={onClose}
             className="flex items-center gap-3"
           >
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 shadow-lg shadow-violet-500/25">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#06B6D4] shadow-lg shadow-indigo-950/30">
               <Dumbbell
                 className="text-white"
                 size={23}
@@ -110,7 +102,7 @@ function Sidebar({
                 GymFlow
               </p>
 
-              <p className="max-w-40 truncate text-xs text-zinc-500">
+              <p className="max-w-40 truncate text-xs text-slate-400">
                 {gym?.gym_name ||
                   "Management Suite"}
               </p>
@@ -120,7 +112,8 @@ function Sidebar({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-2 text-zinc-400 transition hover:bg-white/5 hover:text-white lg:hidden"
+            aria-label="Close navigation"
+            className="rounded-xl p-2 text-slate-400 transition hover:bg-white/10 hover:text-white lg:hidden"
           >
             <X size={20} />
           </button>
@@ -150,24 +143,20 @@ function Sidebar({
                 <NavLink
                   to={path}
                   onClick={onClose}
-                  className={({
-                    isActive,
-                  }) =>
-                    `group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                  className={({ isActive }) =>
+                    `group relative flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? "bg-white/10 text-white shadow-inner shadow-white/5"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                        ? "bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white shadow-lg shadow-indigo-950/20"
+                        : "text-slate-400 hover:bg-[#1F2937] hover:text-white"
                     }`
                   }
                 >
-                  {({
-                    isActive,
-                  }) => (
+                  {({ isActive }) => (
                     <>
                       {isActive && (
                         <motion.span
                           layoutId="active-navigation"
-                          className="absolute left-0 h-7 w-1 rounded-r-full bg-gradient-to-b from-violet-400 to-cyan-400"
+                          className="absolute left-0 h-7 w-1 rounded-r-full bg-[#06B6D4]"
                         />
                       )}
 
@@ -185,24 +174,28 @@ function Sidebar({
           )}
         </nav>
 
-        <div className="m-4 rounded-3xl border border-violet-400/15 bg-gradient-to-br from-violet-500/15 to-cyan-500/5 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
+        <div className="m-4 rounded-3xl border border-white/10 bg-[#1F2937] p-4 shadow-inner shadow-black/10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
             Software access
           </p>
 
-          <p className="mt-2 text-sm text-white">
+          <p className="mt-2 text-sm font-semibold text-white">
             {gym?.access_status === "active"
               ? "Active access"
               : "Check access"}
           </p>
 
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-slate-400">
             Expires{" "}
             {gym?.access_expiry_date ||
               "not configured"}
           </p>
+
+          <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-700">
+            <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#06B6D4]" />
+          </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }
