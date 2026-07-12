@@ -24,6 +24,14 @@ class GymSerializer(serializers.ModelSerializer):
 
 
 class GymProfileSerializer(serializers.ModelSerializer):
+    access_status = serializers.CharField(
+        read_only=True,
+    )
+
+    is_access_active = serializers.BooleanField(
+        read_only=True,
+    )
+
     class Meta:
         model = Gym
         fields = [
@@ -33,10 +41,19 @@ class GymProfileSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "address",
+            "access_start_date",
+            "access_expiry_date",
+            "access_status",
+            "is_access_active",
             "created_at",
         ]
+
         read_only_fields = [
             "id",
+            "access_start_date",
+            "access_expiry_date",
+            "access_status",
+            "is_access_active",
             "created_at",
         ]
 
@@ -54,7 +71,6 @@ class GymProfileSerializer(serializers.ModelSerializer):
             )
 
         return phone
-
 
 class GymSettingsSerializer(serializers.ModelSerializer):
     gym_name = serializers.CharField(
@@ -189,7 +205,9 @@ class MemberSerializer(serializers.ModelSerializer):
         source="plan.plan_name",
         read_only=True,
     )
+
     membership_status = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Member
@@ -204,19 +222,36 @@ class MemberSerializer(serializers.ModelSerializer):
             "age",
             "gender",
             "address",
+            "photo",
+            "photo_url",
             "joining_date",
             "expiry_date",
             "is_active",
             "membership_status",
             "created_at",
         ]
+
         read_only_fields = [
             "id",
             "gym",
+            "photo_url",
             "is_active",
             "membership_status",
             "created_at",
         ]
+
+    def get_photo_url(self, obj):
+        if not obj.photo:
+            return None
+
+        request = self.context.get("request")
+
+        if request:
+            return request.build_absolute_uri(
+                obj.photo.url
+            )
+
+        return obj.photo.url
 
     def get_membership_status(self, obj):
         today = timezone.localdate()
@@ -269,8 +304,8 @@ class MemberSerializer(serializers.ModelSerializer):
 
             if duplicate_members.exists():
                 raise serializers.ValidationError(
-                    "A member with this phone number already exists "
-                    "in your gym."
+                    "A member with this phone number "
+                    "already exists in your gym."
                 )
 
         return phone
@@ -286,11 +321,38 @@ class MemberSerializer(serializers.ModelSerializer):
 
         return value
 
+def validate_photo(self, value):
+    # No file uploaded
+    if value is None:
+        return value
+
+    # Maximum 5 MB
+    if value.size > 5 * 1024 * 1024:
+        raise serializers.ValidationError(
+            "Photo size cannot exceed 5 MB."
+        )
+
+    allowed_content_types = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+    ]
+
+    content_type = getattr(value, "content_type", None)
+
+    if content_type and content_type not in allowed_content_types:
+        raise serializers.ValidationError(
+            "Only JPG, PNG and WEBP images are allowed."
+        )
+
+    return value
     def validate(self, attrs):
         joining_date = attrs.get(
             "joining_date",
             getattr(self.instance, "joining_date", None),
         )
+
         expiry_date = attrs.get(
             "expiry_date",
             getattr(self.instance, "expiry_date", None),
@@ -311,6 +373,7 @@ class MemberSerializer(serializers.ModelSerializer):
             "plan",
             getattr(self.instance, "plan", None),
         )
+
         request = self.context.get("request")
 
         if request and request.user.is_authenticated and plan:
@@ -319,8 +382,8 @@ class MemberSerializer(serializers.ModelSerializer):
             if plan.gym_id != gym.id:
                 raise serializers.ValidationError({
                     "plan": (
-                        "This membership plan does not belong "
-                        "to your gym."
+                        "This membership plan does not "
+                        "belong to your gym."
                     )
                 })
 
@@ -344,8 +407,10 @@ class MemberSerializer(serializers.ModelSerializer):
             expiry_date >= timezone.localdate()
         )
 
-        return super().update(instance, validated_data)
-
+        return super().update(
+            instance,
+            validated_data,
+        )
 
 class AttendanceSerializer(serializers.ModelSerializer):
     member_name = serializers.CharField(

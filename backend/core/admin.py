@@ -18,9 +18,36 @@ class GymAdmin(admin.ModelAdmin):
         "owner_name",
         "email",
         "phone",
+        "access_start_date",
+        "access_expiry_date",
+        "display_access_status",
         "created_at",
     )
-    search_fields = ("gym_name", "owner_name", "email", "phone")
+
+    list_filter = (
+        "access_start_date",
+        "access_expiry_date",
+    )
+
+    search_fields = (
+        "gym_name",
+        "owner_name",
+        "email",
+        "phone",
+        "owner__username",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "display_access_status",
+    )
+
+    @admin.display(
+        description="Software Access",
+        boolean=True,
+    )
+    def display_access_status(self, obj):
+        return obj.is_access_active
 
 
 @admin.register(StaffProfile)
@@ -63,10 +90,37 @@ class MemberAdmin(admin.ModelAdmin):
         "joining_date",
         "expiry_date",
         "is_active",
+        "is_deleted",
     )
-    list_filter = ("gym", "gender", "is_active", "plan")
-    search_fields = ("name", "phone", "email")
 
+    list_filter = (
+        "gym",
+        "gender",
+        "is_active",
+        "is_deleted",
+        "plan",
+    )
+
+    search_fields = (
+        "name",
+        "phone",
+        "email",
+        "address",
+        "plan__plan_name",
+    )
+
+    readonly_fields = (
+        "deleted_at",
+        "deleted_by",
+        "created_at",
+    )
+
+    def get_queryset(self, request):
+        return Member.all_objects.select_related(
+            "gym",
+            "plan",
+            "deleted_by",
+        )
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):

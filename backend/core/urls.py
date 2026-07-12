@@ -43,6 +43,19 @@ from core.views.revenue_views import (
     RecentRenewalsView,
     RevenueSummaryView,
 )
+from core.views.graph_views import (
+    AgeDistributionView,
+    AttendanceTrendView,
+    ExpiryTrendView,
+    GenderDistributionView,
+)
+
+from core.views.notification_views import (
+    AbsentMembersNotificationView,
+    ExpiredMembersNotificationView,
+    ExpiringMembersNotificationView,
+    NotificationSummaryView,
+)
 
 router = DefaultRouter()
 router.register("members", MemberViewSet, basename="members")
@@ -117,5 +130,52 @@ path(
     "dashboard/recent-renewals/",
     RecentRenewalsView.as_view(),
     name="recent-renewals",
+),
+path(
+    "dashboard/gender-distribution/",
+    GenderDistributionView.as_view(),
+    name="gender-distribution",
+),
+
+path(
+    "dashboard/age-distribution/",
+    AgeDistributionView.as_view(),
+    name="age-distribution",
+),
+
+path(
+    "dashboard/attendance-trend/",
+    AttendanceTrendView.as_view(),
+    name="attendance-trend",
+),
+
+path(
+    "dashboard/expiry-trend/",
+    ExpiryTrendView.as_view(),
+    name="expiry-trend",
+),
+
+path(
+    "notifications/summary/",
+    NotificationSummaryView.as_view(),
+    name="notification-summary",
+),
+
+path(
+    "notifications/expiring-members/",
+    ExpiringMembersNotificationView.as_view(),
+    name="expiring-member-notifications",
+),
+
+path(
+    "notifications/absent-members/",
+    AbsentMembersNotificationView.as_view(),
+    name="absent-member-notifications",
+),
+
+path(
+    "notifications/expired-members/",
+    ExpiredMembersNotificationView.as_view(),
+    name="expired-member-notifications",
 ),
 ]

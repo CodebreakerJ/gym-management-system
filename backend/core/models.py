@@ -1,22 +1,52 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from pathlib import Path
+from uuid import uuid4
+from django.utils import timezone
 
 class Gym(models.Model):
     owner = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name="gym_profile"
+        related_name="gym_profile",
     )
+
     gym_name = models.CharField(max_length=150)
     owner_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
     address = models.TextField(blank=True)
+
+    # Your yearly software access dates
+    access_start_date = models.DateField(
+        null=True,
+        blank=True,
+    )
+
+    access_expiry_date = models.DateField(
+        null=True,
+        blank=True,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["gym_name"]
+
+    @property
+    def is_access_active(self):
+        """
+        Existing gyms without an expiry date remain active.
+        Once an expiry date is added, access is checked automatically.
+        """
+        if not self.access_expiry_date:
+            return True
+
+        return self.access_expiry_date >= timezone.localdate()
+
+    @property
+    def access_status(self):
+        return "active" if self.is_access_active else "expired"
 
     def __str__(self):
         return self.gym_name
@@ -201,6 +231,28 @@ class MembershipHistory(models.Model):
             f"{self.start_date} to {self.end_date}"
         )
 
+def member_photo_upload_path(instance, filename):
+    extension = Path(filename).suffix.lower()
+
+    if not extension:
+        extension = ".jpg"
+
+    unique_filename = f"{uuid4().hex}{extension}"
+
+    return (
+        f"gyms/{instance.gym_id}/"
+        f"members/photos/{unique_filename}"
+    )
+
+
+class ActiveMemberManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(is_deleted=False)
+        )
+
 class Member(models.Model):
     GENDER_CHOICES = (
         ("Male", "Male"),
@@ -211,7 +263,7 @@ class Member(models.Model):
     gym = models.ForeignKey(
         Gym,
         on_delete=models.CASCADE,
-        related_name="members"
+        related_name="members",
     )
 
     plan = models.ForeignKey(
@@ -219,42 +271,108 @@ class Member(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="members"
+        related_name="members",
     )
 
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField(blank=True)
-
-    age = models.PositiveIntegerField(null=True, blank=True)
+    age = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
 
     gender = models.CharField(
         max_length=10,
-        choices=GENDER_CHOICES
+        choices=GENDER_CHOICES,
     )
 
     address = models.TextField(blank=True)
 
+    photo = models.ImageField(
+        upload_to=member_photo_upload_path,
+        null=True,
+        blank=True,
+    )
+
     joining_date = models.DateField()
     expiry_date = models.DateField()
-
     is_active = models.BooleanField(default=True)
 
+    is_deleted = models.BooleanField(default=False)
+
+    deleted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    deleted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="deleted_members",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = ActiveMemberManager()
+    all_objects = models.Manager()
 
     class Meta:
         ordering = ["-id"]
 
         indexes = [
-            models.Index(fields=["gym", "name"]),
-            models.Index(fields=["gym", "phone"]),
-            models.Index(fields=["gym", "expiry_date"]),
-            models.Index(fields=["gym", "is_active"]),
+            models.Index(
+                fields=["gym", "name"],
+                name="member_gym_name_idx",
+            ),
+            models.Index(
+                fields=["gym", "phone"],
+                name="member_gym_phone_idx",
+            ),
+            models.Index(
+                fields=["gym", "expiry_date"],
+                name="member_gym_expiry_idx",
+            ),
+            models.Index(
+                fields=["gym", "is_active"],
+                name="member_gym_active_idx",
+            ),
+            models.Index(
+                fields=["gym", "is_deleted"],
+                name="member_gym_deleted_idx",
+            ),
         ]
+
+    def soft_delete(self, user=None):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+
+        self.save(
+            update_fields=[
+                "is_deleted",
+                "deleted_at",
+                "deleted_by",
+            ]
+        )
+
+    def restore(self):
+        self.is_deleted = False
+        self.deleted_at = None
+        self.deleted_by = None
+
+        self.save(
+            update_fields=[
+                "is_deleted",
+                "deleted_at",
+                "deleted_by",
+            ]
+        )
 
     def __str__(self):
         return self.name
-
 
 class Attendance(models.Model):
     gym = models.ForeignKey(
