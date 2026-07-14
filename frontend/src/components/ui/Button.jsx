@@ -1,3 +1,5 @@
+import { motion } from "motion/react";
+
 const buttonVariants = {
   primary:
     "bg-[#4F46E5] text-white shadow-sm shadow-indigo-500/20 hover:bg-[#4338CA] hover:shadow-md hover:shadow-indigo-500/20",
@@ -23,3 +25,86 @@ const buttonVariants = {
   warning:
     "bg-amber-50 text-[#F59E0B] hover:bg-amber-100",
 };
+
+const buttonSizes = {
+  sm: "h-9 rounded-xl px-3 text-xs",
+  md: "h-11 rounded-2xl px-4 text-sm",
+  lg: "h-13 rounded-2xl px-5 text-sm",
+  icon: "h-11 w-11 rounded-2xl p-0",
+};
+
+function Button({
+  children,
+  className = "",
+  variant = "primary",
+  size = "md",
+  loading = false,
+  disabled = false,
+  leftIcon: LeftIcon,
+  rightIcon: RightIcon,
+  type = "button",
+  onClick,
+  ...props
+}) {
+  const variantClass =
+    buttonVariants[variant] ||
+    buttonVariants.primary;
+
+  const sizeClass =
+    buttonSizes[size] ||
+    buttonSizes.md;
+
+  return (
+    <motion.button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      whileHover={
+        disabled || loading
+          ? undefined
+          : {
+              y: -2,
+            }
+      }
+      whileTap={
+        disabled || loading
+          ? undefined
+          : {
+              scale: 0.97,
+            }
+      }
+      className={`
+        inline-flex
+        items-center
+        justify-center
+        gap-2
+        font-medium
+        tracking-[0.2px]
+        transition-all
+        focus:outline-none
+        focus:ring-4
+        focus:ring-indigo-100
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+        ${variantClass}
+        ${sizeClass}
+        ${className}
+      `}
+      {...props}
+    >
+      {loading ? (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      ) : (
+        LeftIcon && <LeftIcon size={17} />
+      )}
+
+      {children}
+
+      {!loading && RightIcon && (
+        <RightIcon size={17} />
+      )}
+    </motion.button>
+  );
+}
+
+export default Button;
